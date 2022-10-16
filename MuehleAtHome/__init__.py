@@ -80,7 +80,7 @@ class MuehleDevice():
         msg += response.headers['Date'] + "\n"
         msg += payload.decode()
         signature = hmac.new(
-            device._group_key_bytes,
+            self._group_key_bytes,
             digestmod="sha256",
             msg=msg.encode("ASCII")).digest()
         return signature
