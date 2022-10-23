@@ -68,7 +68,7 @@ class MuehleDevice():
 
         if content_header is not None and content_header != "":
             header['Content-Type'] = self.content_header
-            header['X-Signature'] = "MieleH256" + self.group_id + ":" + signature # this is working
+            header['X-Signature'] = "MieleH256 " + self.group_id + ":" + signature # this is working
 
         return header, signature
 
@@ -185,21 +185,28 @@ class MuehleDevice():
         return json_data
 
     def put_request(self, resource_path = ""):
-        """request json data from the device
-        """
-        resource_path = "/" + resource_path
-        payload = '{\n\t"DeviceName":"Test"\n\n}\n'
-        header, packet_signature = self.make_header("PUT", resource_path, accept_header="", content_header = self.content_header, payload=payload)
+        """send JSON data to the device"""
 
+        resource_path = "/" + resource_path
+
+        payload = '{\n\t"DeviceName":"Test"\n\n}\n'
+
+        # pad payload to a multiple of 16 bytes for encryption
         msg = payload.encode("ASCII")
-        msg = msg + (16-(len(msg)%16)) * b'0' # add padding for len%16==0
+        msg = msg.ljust((len(msg) + 15) & ~15)
+        msg = msg.decode()
+
+        header, packet_signature = self.make_header("PUT", resource_path, accept_header=self.accept_header, content_header = self.content_header, payload=msg)
+
         msg = self.encrypt(msg, packet_signature)
+
         r = requests.request("PUT",
             url='http://%s%s'%(self.device_ip, resource_path),
             headers = header,
-            data = 12
+            data = msg,
         )
+
         if not r.ok:
-            return r
+            return None
 
         return r
