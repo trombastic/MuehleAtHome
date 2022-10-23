@@ -12,7 +12,7 @@ def http_date():
     return datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
 class MuehleDevice():
-    user_agent = "Muehle@mobile %s Python"%(__version__)
+    user_agent = "Muehle@home %s Python" % (__version__)
     accept_header = "application/vnd.miele.v1+json"
     content_header = "application/vnd.miele.v1+json; charset=utf-8"
 
