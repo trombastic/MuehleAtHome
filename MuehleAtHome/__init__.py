@@ -184,12 +184,10 @@ class MuehleDevice():
         json_data = json.loads(raw_json_str)
         return json_data
 
-    def put_request(self, resource_path = ""):
+    def put_request(self, resource_path, payload):
         """send JSON data to the device"""
 
         resource_path = "/" + resource_path
-
-        payload = '{\n\t"DeviceName":"Test"\n\n}\n'
 
         # pad payload to a multiple of 16 bytes for encryption
         msg = payload.encode("utf-8")
