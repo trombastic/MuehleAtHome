@@ -47,7 +47,7 @@ class MuehleDevice():
         signature = hmac.new(
             self._group_key_bytes,
             digestmod="sha256",
-            msg=msg.encode("ASCII")).digest()
+            msg=msg.encode("utf-8")).digest()
         return signature
 
     def make_header(self, request_type, resource_path, accept_header=accept_header, content_header=content_header, payload=""):
@@ -82,7 +82,7 @@ class MuehleDevice():
         signature = hmac.new(
             self._group_key_bytes,
             digestmod="sha256",
-            msg=msg.encode("ASCII")).digest()
+            msg=msg.encode("utf-8")).digest()
         return signature
 
     def commissioning(self):
@@ -192,7 +192,7 @@ class MuehleDevice():
         payload = '{\n\t"DeviceName":"Test"\n\n}\n'
 
         # pad payload to a multiple of 16 bytes for encryption
-        msg = payload.encode("ASCII")
+        msg = payload.encode("utf-8")
         msg = msg.ljust((len(msg) + 15) & ~15)
         msg = msg.decode()
 
