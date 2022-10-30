@@ -88,13 +88,13 @@ class MuehleDevice():
         return signature
 
     def commissioning(self):
-        """comisioning and key exchange with the houshold applience
+        """comisioning and key exchange with the household appliance
 
-        this has to be done once to negociate the group_id and group_key with the
-        houshold applience.
+        This has to be done once to negotiate the group ID and group key with the
+        houshold appliance.
         If the device is already connected to the Miele@Mobile there are two options:
-            - reset the device to be able to do a new commissioning (this will break all preavious connetions)
-            - try to get the group_id and group_key from your mobile device
+            - reset the device to be able to do a new commissioning (this will break all previous connections)
+            - try to get the group ID and group key from your mobile device
         """
 
         r = requests.request("PUT",
@@ -136,33 +136,33 @@ class MuehleDevice():
 
     @staticmethod
     def parse_signature(response):
-        """parse the signiture string and split it into the three parts
-        <ENCRYPTION_METHOD> <GROUP_ID>:<SIGNITURE>
+        """parse the signature string and split it into the three parts
+        <ENCRYPTION_METHOD> <GROUP_ID>:<SIGNATURE>
         """
         encryption_method, packet_group_key = response.headers["X-Signature"].split(":")[0].split(" ")
-        # paket signiture is the string (hex) after the ':'
-        packet_signiture = response.headers["X-Signature"].split(":")[-1]
-        return encryption_method, packet_group_key, packet_signiture
+        # packet signature is the string (hex) after the ':'
+        packet_signature = response.headers["X-Signature"].split(":")[-1]
+        return encryption_method, packet_group_key, packet_signature
 
-    def _crypt(self, packet_signiture):
+    def _crypt(self, packet_signature):
         """AES_CBC encryption for the MieleH256 encryption
         """
         # first 32 bytes of the group key is the AES key for decryption
         aes_key = self._group_key_bytes[:32]
         # first 16 bytes of the signature of the response packet are the init vector for the decryption
-        iv = bytes.fromhex(packet_signiture)[:16]
+        iv = bytes.fromhex(packet_signature)[:16]
         return AES.new(aes_key, AES.MODE_CBC, iv)
 
-    def encrypt(self, msg, packet_signiture):
+    def encrypt(self, msg, packet_signature):
         """encrypt a packet for PUT and POST payload
         """
-        cipher = self._crypt(packet_signiture)
+        cipher = self._crypt(packet_signature)
         return cipher.encrypt(msg)
 
-    def decrypt(self, msg, packet_signiture):
+    def decrypt(self, msg, packet_signature):
         """decrypt payload of get requests
         """
-        cipher = self._crypt(packet_signiture)
+        cipher = self._crypt(packet_signature)
         return cipher.decrypt(msg)
 
     def get_endpoints(self, root=""):
