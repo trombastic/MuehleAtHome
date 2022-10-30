@@ -8,6 +8,8 @@ from Crypto.Random import get_random_bytes # pycrypto is not working with python
 
 __version__ = "0.0.1"
 
+request_timeout = 2.0
+
 def http_date():
     return datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
@@ -107,6 +109,7 @@ class MuehleDevice():
                 "connection": "close"
             },
             data='{"GroupID":"' + self.group_id + '","GroupKey":"'+ self.group_key + '"}',
+            timeout=request_timeout,
         )
         #fixme do something with the response (e.g. check return code and handle errors)
 
@@ -117,6 +120,7 @@ class MuehleDevice():
         r = requests.request("GET",
             url='http://%s%s'%(self.device_ip, resource_path),
             headers = self.make_header("GET", resource_path, content_header = "")[0],
+            timeout=request_timeout,
         )
         if not r.ok:
             return None
@@ -202,6 +206,7 @@ class MuehleDevice():
             url='http://%s%s'%(self.device_ip, resource_path),
             headers = header,
             data = msg,
+            timeout=request_timeout,
         )
 
         if not r.ok:
